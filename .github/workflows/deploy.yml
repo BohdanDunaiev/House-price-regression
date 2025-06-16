@@ -18,15 +18,17 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Build Docker image
-      run: docker build -t housepriceapi .
+    - name: Build and tag Docker image
+      run: |
+        docker build -t housepriceapi .
 
     - name: Save Docker image as tarball
       run: |
-        docker save housepriceapi | gzip > housepriceapi.tar.gz
+        mkdir -p deploy-dir
+        docker save housepriceapi | gzip > deploy-dir/housepriceapi.tar.gz
 
-    - name: Deploy to Web App
+    - name: Deploy to Web App using tarball
       uses: azure/webapps-deploy@v2
       with:
         app-name: housepriceapi
-        package: housepriceapi.tar.gz
+        package: deploy-dir/housepriceapi.tar.gz
