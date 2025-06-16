@@ -1,4 +1,4 @@
-name: Deploy to Azure Web App (No Docker)
+name: Build and Deploy to Azure via ACR
 
 on:
   push:
@@ -13,20 +13,22 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
+    - name: Azure Login
+      uses: azure/login@v1
       with:
-        python-version: '3.10'
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Install dependencies
+    - name: Docker Login to ACR
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        az acr login --name myregistry
 
-    - name: Upload to Azure
+    - name: Build and Push image to ACR
+      run: |
+        docker build -t myregistry.azurecr.io/housepriceapi:latest .
+        docker push myregistry.azurecr.io/housepriceapi:latest
+
+    - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
         app-name: housepriceapi
-        slot-name: production
-        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-        package: .
+        images: myregistry.azurecr.io/housepriceapi:latest
