@@ -1,0 +1,93 @@
+`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>House Price Predictor</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    input, button { margin: 0.5rem 0; padding: 0.5rem; width: 100%; }
+    #output { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>🏠 House Price Predictor</h1>
+  <form id="predictForm">
+    <label for="GrLivArea">Above Ground Living Area (sq ft):</label>
+    <input type="number" id="GrLivArea" name="GrLivArea" value="1500" required />
+
+    <label for="OverallQual">Overall Quality (1-10):</label>
+    <input type="number" id="OverallQual" name="OverallQual" value="5" required />
+
+    <button type="submit">Predict</button>
+  </form>
+
+  <div id="output"></div>
+
+  <script>
+    document.getElementById('predictForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const data = {
+        Id: 1,
+        MSSubClass: 20,
+        LotFrontage: 70.0,
+        LotArea: 7000,
+        OverallQual: parseInt(document.getElementById('OverallQual').value),
+        OverallCond: 5,
+        YearBuilt: 2000,
+        YearRemodAdd: 2005,
+        MasVnrArea: 100.0,
+        ExterQual: "Gd",
+        BsmtQual: "Gd",
+        BsmtFinSF1: 500,
+        BsmtFinSF2: 0,
+        BsmtUnfSF: 200,
+        TotalBsmtSF: 700,
+        HeatingQC: "Ex",
+        FirstFlrSF: 1000,
+        SecondFlrSF: 500,
+        LowQualFinSF: 0,
+        GrLivArea: parseInt(document.getElementById('GrLivArea').value),
+        BsmtFullBath: 1,
+        BsmtHalfBath: 0,
+        FullBath: 2,
+        HalfBath: 1,
+        BedroomAbvGr: 3,
+        KitchenAbvGr: 1,
+        KitchenQual: "Gd",
+        TotRmsAbvGrd: 6,
+        Fireplaces: 1,
+        FireplaceQu: "TA",
+        GarageYrBlt: 2000,
+        GarageCars: 2,
+        GarageArea: 400.0,
+        GarageQual: "TA",
+        WoodDeckSF: 100,
+        OpenPorchSF: 50,
+        EnclosedPorch: 0,
+        ThreeSsnPorch: 0,
+        ScreenPorch: 0,
+        PoolArea: 0,
+        MiscVal: 0,
+        MoSold: 6,
+        YrSold: 2020,
+        TotalSF: 2200,
+        HouseAge: 20,
+        RemodelAge: 15,
+        IsRemodeled: true
+      };
+
+      const res = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      document.getElementById('output').innerText = `Predicted Price: $${result.predicted_price}`;
+    });
+  </script>
+</body>
+</html>
+`
