@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import pandas as pd
 import numpy as np
 import joblib
 
 # Initialize app
 app = FastAPI(title="🏠 House Price Prediction API")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Load trained model
 model = joblib.load("house_price_stack_pipeline.joblib")
@@ -85,3 +88,7 @@ def predict_price(features: HouseFeatures):
     price = np.expm1(log_price)
 
     return {"predicted_price": round(price, 2)}
+
+@app.get("/")
+def root():
+    return FileResponse("static/index.html")
